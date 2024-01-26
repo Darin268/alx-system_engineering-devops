@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-# This script stops the 4-to_infinity_and_beyond process
-
-# Find the process ID (PID) of 4-to_infinity_and_beyond
-pid=$(ps aux | grep "4-to_infinity_and_beyond" | awk '{print $2}')
-
-if [ -n "$pid" ]; then
-# If PID is not empty, kill the process
-kill "$pid"
-echo "Terminated"
-else
-echo "Process not found"
-fi
+# Kills 4-to_infinity_and_beyond process.
+PRID=$(pgrep -f 4-to_infinity_and_beyond)
+kill "$PRID"
