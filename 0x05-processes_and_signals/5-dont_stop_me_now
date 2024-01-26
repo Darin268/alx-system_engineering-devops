@@ -2,7 +2,7 @@
 # This script stops the 4-to_infinity_and_beyond process
 
 # Find the process ID (PID) of 4-to_infinity_and_beyond
-pid=$(pgrep -f "4-to_infinity_and_beyond")
+pid=$(ps aux | grep "4-to_infinity_and_beyond" | awk '{print $2}')
 
 if [ -n "$pid" ]; then
 # If PID is not empty, kill the process
