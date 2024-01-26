@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # This script demonstrates handling signals and creating a PID file
 
-pid_file="/var/run/myscript.pid"
+PRID=$$
+echo "$PRID" > /var/run/myscript.pid
 
 # Function to clean up and exit
 cleanup() {
