@@ -1,29 +1,25 @@
 #!/usr/bin/env bash
 # Bash script to install and configure Nginx web server
 
-# Update package index and install nginx
-apt-get update -y
-apt-get install nginx -y
+# Update package index
+apt-get update
 
-# Start nginx
-/etc/init.d/nginx start
+# Install Nginx
+apt-get install -y nginx
 
-# Check if nginx is running
-if pgrep nginx >/dev/null 2>&1; then
-    echo "Nginx is running."
-else
-    echo "Nginx failed to start. Check Nginx logs for errors."
-    exit 1
-fi
-
-# Create a custom index page with "Hello World!"
+# Replace default index.html with "Hello World!"
 echo "Hello World!" > /var/www/html/index.html
 
-# Verify nginx configuration and restart nginx
-nginx -t
-/etc/init.d/nginx reload
+# Check if Nginx is already listening on port 80
+if netstat -tuln | grep ':80.*nginx' >/dev/null; then
+    echo "Nginx is already listening on port 80."
+else
+    # Configure Nginx to listen on port 80
+    sed -i 's/^\(listen\s\+\)\(.*\)$/\180;/' /etc/nginx/sites-available/default
+    service nginx restart
+fi
 
-# Check nginx response at root
+# Check Nginx response at root
 response=$(curl -s http://localhost)
 if [[ $response == *"Hello World"* ]]; then
     echo "Nginx is serving 'Hello World!'"
