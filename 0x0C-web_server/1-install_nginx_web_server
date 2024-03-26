@@ -1,32 +1,8 @@
 #!/usr/bin/env bash
-# Script to install and configure Nginx web server
+# installs nginx and configures it on a remote server
 
-# Update package index
-apt-get update
-
-# Install Nginx
-apt-get install -y nginx
-
-# Replace default index.html with "Hello World!"
-echo "Hello World!" > /var/www/html/index.html
-
-# Check if Nginx is already listening on port 80
-if netstat -tuln | grep ':80.*nginx' >/dev/null; then
-    echo "Nginx is already listening on port 80."
-else
-    # Configure Nginx to listen on port 80
-    sed -i 's/^\(listen\s\+\)\(.*\)$/\180;/' /etc/nginx/sites-available/default
-    service nginx restart
-fi
-
-# Check Nginx response at root
-response=$(curl -s http://localhost)
-if [[ $response == *"Hello World"* ]]; then
-    echo "Nginx is serving 'Hello World!'"
-else
-    echo "Nginx is not serving 'Hello World!'"
-    exit 1
-fi
-
-service nginx restart
-
+apt-get -y update
+apt-get -y install nginx
+ufw allow 'Nginx HTTP'
+echo 'Hello World!' > /var/www/html/index.nginx-debian.html
+service nginx start
