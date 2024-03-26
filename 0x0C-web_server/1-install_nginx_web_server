@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Bash script to install and configure Nginx web server
+
+# Update package index and install nginx
+apt-get update -y
+apt-get install nginx -y
+
+# Start nginx
+/etc/init.d/nginx start
+
+# Check if nginx is running
+if pgrep nginx >/dev/null 2>&1; then
+    echo "Nginx is running."
+else
+    echo "Nginx failed to start. Check Nginx logs for errors."
+    exit 1
+fi
+
+# Create a custom index page with "Hello World!"
+echo "Hello World!" > /var/www/html/index.html
+
+# Verify nginx configuration and restart nginx
+nginx -t
+/etc/init.d/nginx reload
+
+# Check nginx response at root
+response=$(curl -s http://localhost)
+if [[ $response == *"Hello World"* ]]; then
+    echo "Nginx is serving 'Hello World!'"
+else
+    echo "Nginx is not serving 'Hello World!'"
+    exit 1
+fi
