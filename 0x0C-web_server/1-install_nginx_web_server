@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
-# Script to configure a new Ubuntu machine with Nginx serving "Hello World!" on port 80
+# Script to install and configure Nginx web server
 
-# Update package index and install Nginx
+# Update package index
 apt-get update
+
+# Install Nginx
 apt-get install -y nginx
 
 # Replace default index.html with "Hello World!"
 echo "Hello World!" > /var/www/html/index.html
 
-# Restart Nginx
+# Check if Nginx is already listening on port 80
+if netstat -tuln | grep ':80.*nginx' >/dev/null; then
+    echo "Nginx is already listening on port 80."
+else
+    # Configure Nginx to listen on port 80
+    sed -i 's/^\(listen\s\+\)\(.*\)$/\180;/' /etc/nginx/sites-available/default
+    service nginx restart
+fi
+
+# Check Nginx response at root
+response=$(curl -s http://localhost)
+if [[ $response == *"Hello World"* ]]; then
+    echo "Nginx is serving 'Hello World!'"
+else
+    echo "Nginx is not serving 'Hello World!'"
+    exit 1
+fi
+
 service nginx restart
 
