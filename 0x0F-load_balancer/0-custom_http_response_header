@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# This script configures Nginx to include a custom HTTP response header
+# Script to configure Nginx server with a custom header
 
-# Install Nginx
-sudo apt-get update
-sudo apt-get install -y nginx
+# Update package lists and install Nginx
+sudo apt-get -y update
+sudo apt-get -y install nginx
 
-# Define the custom header
-custom_header="X-Served-By"
+# Create index and custom 404 page
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
 
-# Get the hostname of the server
-hostname=$(hostname)
-
-# Configure Nginx to add the custom header
-sudo sed -i '/^http {/a \\t# Add custom header\n\tadd_header '"$custom_header"' '"$hostname"';' /etc/nginx/nginx.conf
+# Update Nginx configuration
+sudo sed -i "s/server_name _;/server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/Tolulope05 permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}/" /etc/nginx/sites-available/default
+sudo sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
 
 # Restart Nginx to apply changes
-sudo systemctl restart nginx
+sudo systemctl start nginx
