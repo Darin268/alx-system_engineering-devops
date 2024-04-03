@@ -20,3 +20,6 @@ echo "ENABLED=1" > /etc/default/haproxy
 " >> /etc/haproxy/haproxy.cfg
 
 service haproxy start
+
+
+echo "HAProxy installed and configured successfully. Servers: web-01, web-02"
