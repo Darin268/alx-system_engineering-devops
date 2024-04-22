@@ -1,63 +1,18 @@
 #!/usr/bin/python3
-
-"""
-This script fetches TODO list progress for a given employee ID using a REST API.
-It accepts an integer as a parameter, which is the employee ID.
-It displays the employee TODO list progress in a specific format and exports the data in CSV format.
-"""
-
-import requests
+"""Exports to-do list information for a given employee ID to CSV format."""
 import csv
+import requests
 import sys
 
-def fetch_todo_list_progress(employee_id):
-    """
-    Fetches TODO list progress for a given employee ID.
-
-    Args:
-        employee_id (int): The ID of the employee.
-
-    Returns:
-        list: List of dictionaries containing task information.
-    """
-    # API endpoint
-    url = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
-
-    # Fetching data from the API
-    response = requests.get(url)
-    todos = response.json()
-
-    return todos
-
-def export_to_csv(employee_id, todos):
-    """
-    Exports TODO list progress to a CSV file.
-
-    Args:
-        employee_id (int): The ID of the employee.
-        todos (list): List of dictionaries containing task information.
-
-    Returns:
-        None
-    """
-    filename = f"{employee_id}.csv"
-    with open(filename, 'w', newline='') as csvfile:
-        fieldnames = ['USER_ID', 'USERNAME', 'TASK_COMPLETED_STATUS', 'TASK_TITLE']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        for todo in todos:
-            writer.writerow({
-                'USER_ID': employee_id,
-                'USERNAME': todo.get('name'),
-                'TASK_COMPLETED_STATUS': todo.get('completed'),
-                'TASK_TITLE': todo.get('title')
-            })
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
-    employee_id = int(sys.argv[1])
-    todos = fetch_todo_list_progress(employee_id)
-    export_to_csv(employee_id, todos)
+    user_id = sys.argv[1]
+    url = "https://jsonplaceholder.typicode.com/"
+    user = requests.get(url + "users/{}".format(user_id)).json()
+    username = user.get("username")
+    todos = requests.get(url + "todos", params={"userId": user_id}).json()
+
+    with open("{}.csv".format(user_id), "w", newline="") as csvfile:
+        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+        [writer.writerow(
+            [user_id, username, t.get("completed"), t.get("title")]
+         ) for t in todos]
